@@ -6,6 +6,8 @@ import sys
 sys.path.insert(0, '..') # pth)
 from predict import predict
 
+print(os.path.basename(__file__))
+
 
 si = predict(fname='../data/full_histories_eagle.h5')
 si.training_mask()

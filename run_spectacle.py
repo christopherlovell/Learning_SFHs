@@ -3,13 +3,13 @@ import h5py
 import schwimmbad
 from functools import partial
 
-from spectacle import spectacle
+# from spectacle import spectacle
 from predict import predict
 
 def main(pool):
     
     # choose filename
-    fname = 'data/full_histories_eagle.h5' # 'data/full_histories_illustris.h5'
+    fname = 'data/full_histories_eagle.h5'#'data/full_histories_illustris.h5'
     # SFR timescales?
     A = False
     # Bin histories?
@@ -17,7 +17,7 @@ def main(pool):
     # Generate spectra?
     C = True
     # grid name?
-    grid_name = 'fsps'
+    grid_name = 'fsps_neb'
     # dust attenuated spectra?
     D = True
 
@@ -26,6 +26,7 @@ def main(pool):
 
     ## Load subhalo IDs for use in pool calls
     shids = tacle.load_arr('ID','Subhalos')
+    print("Number of subhalos: %i"%len(shids))
 
     if A:
         ## SFR timescales (in parallel) ##
@@ -49,7 +50,6 @@ def main(pool):
         print('SFR 1000:')
         lg = partial(tacle.recalculate_sfr, time=1.0)
         sfr1000 = np.array(list(pool.map(lg,shids)))
-        pool.close()
     
         tacle.save_arr(sfr100,'SFR 100Myr','Subhalos')
         tacle.save_arr(sfr10,'SFR 10Myr','Subhalos')
@@ -74,7 +74,6 @@ def main(pool):
     
         lg = partial(tacle.bin_histories, binLimits=binLimits, binWidths=binWidths)
         sfh = np.array(list(pool.map(lg,shids)))
-        pool.close()
     
         tacle.save_arr(sfh,'log_8','SFH')
 
@@ -88,14 +87,12 @@ def main(pool):
         wl = grid['wavelength']
         
         resample_wl = np.loadtxt('data/wavelength_grid.txt')
-        print(resample_wl)
-
-        tacle.create_lookup_table(tacle.redshift)
+        # tacle.create_lookup_table(tacle.redshift)
+        tacle.load_lookup_table(tacle.redshift)
     
         ## Calculate weights (in parallel)
-        lg = partial(tacle.weights_grid, Z=Z, A=A, resample=True)
+        lg = partial(tacle.weights_grid, Z=Z, A=A, resample=True, verbose=True)
         weights = np.array(list(pool.map(lg,shids)))
-        pool.close()
     
         intrinsic_spectra = tacle.calc_intrinsic_spectra(weights,grid,z=tacle.redshift)
         intrinsic_spectra = tacle.rebin_spectra(intrinsic_spectra, grid['wavelength'],resample_wl)
@@ -136,10 +133,13 @@ def main(pool):
             tacle.save_arr(M_r,'M_r','Photometry/Dust/')
 
 
+    pool.close()
+
+
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
-    parser = ArgumentParser(description="Schwimmbad example.")
+    parser = ArgumentParser(description="Spectacle")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--ncores", dest="n_cores", default=1,

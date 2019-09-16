@@ -23,13 +23,6 @@ from keras import backend as K
 
 from keras.constraints import nonneg
 
-## live plotting
-import matplotlib
-matplotlib.use('agg')
-from matplotlib import pyplot as plt
-from IPython.display import clear_output
-
-
 class predict(spectacle):
 
     def __init__(self, **kwargs):
@@ -216,7 +209,7 @@ class predict(spectacle):
 
 
 
-    def create_cnn_model(self, features, predictors, batch_size=10, train=None, plot=True, max_epochs=1000, loss=None):
+    def create_cnn_model(self, features, predictors, batch_size=10, train=None, plot=False, max_epochs=1000, loss=None, verbose=False, fit=True):
         """
         Define, initialise and train CNN
 
@@ -233,30 +226,37 @@ class predict(spectacle):
             loss = self._SMAPE_tf
        
         # updatable plot
-        class PlotLosses(Callback):
-            def on_train_begin(self, logs={}):
-                self.i = 0
-                self.x = []
-                self.losses = []
-                self.val_losses = []
+        if plot:
+            ## live plotting
+            import matplotlib
+            matplotlib.use('agg')
+            from matplotlib import pyplot as plt
+            from IPython.display import clear_output
+            class PlotLosses(Callback):
+                def on_train_begin(self, logs={}):
+                    self.i = 0
+                    self.x = []
+                    self.losses = []
+                    self.val_losses = []
                 
-                self.fig = plt.figure()
+                    self.fig = plt.figure()
                 
-                self.logs = []
+                    self.logs = []
         
-            def on_epoch_end(self, epoch, logs={}):
+                def on_epoch_end(self, epoch, logs={}):
                 
-                self.logs.append(logs)
-                self.x.append(self.i)
-                self.losses.append(logs.get('loss'))
-                self.val_losses.append(logs.get('val_loss'))
-                self.i += 1
+                    self.logs.append(logs)
+                    self.x.append(self.i)
+                    self.losses.append(logs.get('loss'))
+                    self.val_losses.append(logs.get('val_loss'))
+                    self.i += 1
                 
-                clear_output(wait=True)
-                plt.plot(self.x, self.losses, label="loss")
-                plt.plot(self.x, self.val_losses, label="val_loss")
-                plt.legend()
-                plt.show();
+
+                    clear_output(wait=True)
+                    plt.plot(self.x, self.losses, label="loss")
+                    plt.plot(self.x, self.val_losses, label="val_loss")
+                    plt.legend()
+                    plt.show();
                 
 
         input_dim = features.shape[1:]
@@ -303,14 +303,14 @@ class predict(spectacle):
                       metrics=['mae','mse','accuracy'])
     
         early_stopping_min_delta = 1e-4
-        early_stopping_patience = 8
+        early_stopping_patience = 12
         
         early_stopping = EarlyStopping(monitor='val_loss',
                                    min_delta=early_stopping_min_delta,
                                    patience=early_stopping_patience,
                                    verbose=2, mode='min')
 
-        reduce_lr_patience = 5
+        reduce_lr_patience = 8
         reduce_lr_min = 0.0
         
         reduce_lr = ReduceLROnPlateau(monitor='val_loss',
@@ -332,13 +332,17 @@ class predict(spectacle):
         # validation split is unshuffled, so need to pre-shuffle before training
         mask = np.random.permutation(np.sum(train))
 
-        history = model.fit(features[train][mask], predictors[train][mask],
-                  callbacks=callbacks, 
-                  epochs=max_epochs, batch_size=batch_size, validation_split=0.2, verbose=True)
+        if fit:
+            history = model.fit(features[train][mask], predictors[train][mask],
+                                callbacks=callbacks, epochs=max_epochs, 
+                                batch_size=batch_size, validation_split=0.2, 
+                                verbose=verbose)
     
-        score, mae, mse, acc = model.evaluate(features[~train], predictors[~train], verbose=0)
-        print('Test SMAPE:', score)
-        return model, {'loss': score, 'mse': mse, 'mae': mae, 'acc': acc, 'history': history}
+            score, mae, mse, acc = model.evaluate(features[~train], predictors[~train], verbose=0)
+            print('Test SMAPE:', score)
+            return model, {'loss': score, 'mse': mse, 'mae': mae, 'acc': acc, 'history': history}
+        else:
+            return model
 
 
     ## TODO: check!! (particularly scalers)
@@ -388,7 +392,7 @@ class predict(spectacle):
         sigma = [np.sqrt(np.diag(cov[i])) for i in np.arange(pred.shape[1])]
         sigma= np.stack(sigma)
 
-        corr = cov / sigma[:,None] / sigma[:,None]
+        corr = cov / sigma[:,:,None] / sigma[:,None,:]
         
         return sigma, corr
     

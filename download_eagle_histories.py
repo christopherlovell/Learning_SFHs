@@ -45,7 +45,11 @@ with h5py.File('data/full_histories_eagle.h5','a') as f:
         del f['Subhalos/%s'%field]
           
     for field in list(f["Star Particles"].keys()):
-        del f['Star Particles/%s'%field] 
+        del f['Star Particles/%s'%field]
+
+
+    # set redshift
+    f.attrs['redshift'] = float(tag[5:].replace('p','.')) 
 
 
 with h5py.File('data/full_histories_eagle.h5','a') as f:
