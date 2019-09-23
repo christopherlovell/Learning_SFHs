@@ -43,7 +43,7 @@ def _R_squared(y_true, y_pred):
     return 1 - np.sum((y_pred - y_true)**2) / np.sum((y_true - np.mean(y_true))**2)
 
 
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 def _SMAPE_tf(y_true, y_pred):
     """

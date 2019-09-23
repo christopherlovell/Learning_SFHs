@@ -2,24 +2,23 @@ import numpy as np
 import pickle as pcl
 import random
 
-from keras.optimizers import Adam
-from keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
 
-from keras.layers import Dense, InputLayer, Dropout, Activation
-from keras.layers import Embedding, Conv1D, MaxPooling1D, LSTM, Flatten, GlobalMaxPooling1D
+from tensorflow.keras.layers import Dense, InputLayer, Dropout, Activation
+from tensorflow.keras.layers import Embedding, Conv1D, MaxPooling1D, LSTM, Flatten, GlobalMaxPooling1D
 
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard
 
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 # from hyperas import optim
 # from hyperas.distributions import choice, uniform, conditional
 
-from keras.constraints import nonneg
-
+# from tensorflow.keras.constraints import nonneg
 # from hyperopt import Trials, STATUS_OK, tpe
 
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 from methods.loss import _SMAPE, _SMAPE_tf, _R_squared_tf
 
