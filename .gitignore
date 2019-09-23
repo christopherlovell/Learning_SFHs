@@ -1,1 +1,6 @@
-data
+data/*.h5
+data/VESPA/*.csv
+data/*.p
+data/*.txt
+.ipynb_checkpoints
+__pycache__
