@@ -1,0 +1,10 @@
+data/SDSSspec/*.fit
+data/SDSSspec/*.fit.1
+data/*.p
+data/*.fit
+data/*.fits
+data/*.h5
+data/*.hdf5
+data/VESPA/*.csv
+api-key.txt
+methods/__pycache__
