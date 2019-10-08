@@ -10,18 +10,18 @@ from sklearn.preprocessing import FunctionTransformer, StandardScaler
 from sklearn.pipeline import make_pipeline
 
 ## keras 
-from keras.optimizers import Adam
-from keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
 
-from keras.layers import Dense, InputLayer, Dropout, Activation
-from keras.layers import Embedding, Conv1D, MaxPooling1D, LSTM, Flatten, GlobalMaxPooling1D, BatchNormalization
+from tensorflow.keras.layers import Dense, InputLayer, Dropout, Activation
+from tensorflow.keras.layers import Embedding, Conv1D, MaxPooling1D, LSTM, Flatten, GlobalMaxPooling1D, BatchNormalization
 
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard, Callback
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard, Callback
 
-from keras.models import load_model
-from keras import backend as K
+from tensorflow.keras.models import load_model
+from tensorflow.keras import backend as K
 
-from keras.constraints import nonneg
+from tensorflow.keras.constraints import NonNeg
 
 class predict(spectacle):
 

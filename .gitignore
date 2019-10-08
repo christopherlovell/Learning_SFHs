@@ -8,3 +8,6 @@ data/*.hdf5
 data/VESPA/*.csv
 api-key.txt
 methods/__pycache__
+data/*.txt
+.ipynb_checkpoints
+__pycache__
